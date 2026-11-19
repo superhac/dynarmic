@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         # FIXME: macos-latest
-        os: [ windows-latest, ubuntu-latest ]
+        os: [ windows-latest, ubuntu-24.04 ]
         cpu_detection: [ 0, 1 ]
       fail-fast: false
 
@@ -19,7 +19,7 @@ jobs:
     steps:
 
       - name: Install build dependencies
-        if: ${{matrix.os == 'ubuntu-latest'}}
+        if: ${{matrix.os == 'ubuntu-24.04'}}
         run: sudo apt-get install llvm ninja-build
 
       - name: Install build dependencies
@@ -34,19 +34,19 @@ jobs:
           submodules: true
 
       - name: Checkout unicorn repo
-        if: ${{matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
+        if: ${{matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-latest'}}
         uses: actions/checkout@v2
         with:
           repository: yuzu-emu-mirror/unicorn
           path: externals/unicorn
 
       - name: Build unicorn
-        if: ${{matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'}}
+        if: ${{matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-latest'}}
         working-directory: externals/unicorn
         run: UNICORN_ARCHS=aarch64,arm ./make.sh
 
       - name: Configure CMake
-        if: ${{matrix.os == 'ubuntu-latest'}}
+        if: ${{matrix.os == 'ubuntu-24.04'}}
         env:
           CC: gcc-12
           CXX: g++-12
@@ -82,7 +82,6 @@ jobs:
           -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
           -DDYNARMIC_ENABLE_CPU_FEATURE_DETECTION=${{matrix.cpu_detection}}
-          -G "Visual Studio 17 2022"
           -A x64
 
       - name: Build
